@@ -1,0 +1,40 @@
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    double a, b, res;
+    int operacion;
+    do {
+        cout << "Operaciones basicas\n" << endl;
+        cout << "---------------------" << endl;
+        cout << "1. Suma" << endl;
+        cout << "2. Resta" << endl;
+        cout << "0. Salir" << endl;
+        cout << "---------------------" << endl;
+        cout << "Ingrese la opcion que desea realizar: ";
+        cin >> operacion;
+
+        switch (operacion) {
+            case 1:
+                cout << "Operacion 1: SUMA" << endl;
+                cout << "Proporcione el valor de a: ";
+                cin >> a;
+                cout << "Proporcione el valor de b: ";
+                cin >> b;
+                res = a + b;
+                cout << a << " + " << b << " = " << res << endl;
+                break;
+            case 0:
+                cout << "Saliendo del programa..." << endl;
+                break;
+            default:
+                cout << "Operacion no valida" << endl;
+                break;
+        }
+        cout << endl;
+    } while (operacion != 0);
+
+    system("pause");
+    return 0;
+}
