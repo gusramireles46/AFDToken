@@ -1,4 +1,5 @@
 // Importaciones necesarias para trabajar con lectura de archivos y manejo de excepciones
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -239,7 +240,7 @@ public class Main {
     public static void main(String[] args) {
         AFDToken afd = new AFDToken(); // Crea una instancia del analizador léxico
 
-        try (BufferedReader lector = new BufferedReader(new FileReader("src/cpp/programa_cpp.txt"))) {
+        try (BufferedReader lector = new BufferedReader(new FileReader("src/cpp/programa_cpp_nuevo.txt"))) {
             // Abre el archivo fuente para leer línea por línea
             String linea;
             while ((linea = lector.readLine()) != null) { // Mientras haya líneas por leer
