@@ -1,3 +1,4 @@
+@
 #include <iostream>
 
 using namespace std;
@@ -6,7 +7,7 @@ int main() {
     double a, b, res;
     int operacion;
     do {
-        cout << "Operaciones basicas\n" << endl;
+        cout << "@@@@@@@Operaciones basicas\n" << endl;
         cout << "---------------------" << endl;
         cout << "1. Suma" << endl;
         cout << "2. Resta" << endl;
@@ -88,3 +89,5 @@ acceso
 int a, b;
 cout << "Esto es una prueba" << endl;
 cin >> variable;
+@
+\

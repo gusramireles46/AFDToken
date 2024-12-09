@@ -1,49 +1,34 @@
-// Importaciones necesarias para trabajar con lectura de archivos y manejo de excepciones
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-// Clase principal que implementa un Analizador Léxico Determinista (AFD)
 class AFDToken {
-    // Enum para representar los posibles estados del autómata
     private enum Estado {
         q0, q1, q2, q3, q4, qError
     }
 
-    // Diccionario para almacenar palabras reservadas y tokens especiales
     private final Map<String, String> tokens;
-    // Arrays que contienen los caracteres válidos para letras, números y símbolos
     private final char[] letras;
     private final char[] numeros;
     private final char[] simbolos;
     private final String[] simbolosCompuestos;
 
-    // Constructor para inicializar los atributos del AFD
     public AFDToken() {
-        tokens = new HashMap<>(); // Inicializa el mapa para almacenar los tokens
-        inicializarTokens(); // Carga los tokens predefinidos en el mapa
-        letras = new char[]{ // Letras válidas para identificadores (incluye '_')
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-                'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        tokens = new HashMap<>();
+        inicializarTokens();
+        letras = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-                'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_'
-        };
-        numeros = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}; // Dígitos válidos
-        simbolos = new char[]{ // Símbolos simples válidos
-                '+', '-', '*', '/', '=', '>', '<', ':', ';', ',', '.', '(', ')', '{', '}', '[',
-                ']', '"', '#', '&', '|', '!'
-        };
-        simbolosCompuestos = new String[]{ // Símbolos compuestos válidos
-                "==", "!=", ">=", "<=", "&&", "||", "<<", ">>"
-        };
+                'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_'};
+        numeros = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        simbolos = new char[]{'+', '-', '*', '/', '=', '>', '<', ':', ';', ',', '.', '(', ')', '{', '}', '[', ']',
+                '#', '&', '|', '!', '"'};
+        simbolosCompuestos = new String[]{"==", "!=", ">=", "<=", "&&", "||", "<<", ">>"};
     }
 
-    // Método para inicializar los tokens en el mapa (diccionario)
     private void inicializarTokens() {
-        // Palabras reservadas con sus respectivos códigos
         tokens.put("int", "1010");
         tokens.put("main", "1020");
         tokens.put("double", "1030");
@@ -65,12 +50,10 @@ class AFDToken {
         tokens.put("void", "1190");
         tokens.put("include", "1200");
 
-        // Operadores y símbolos especiales con códigos únicos
         tokens.put("+", "2010");
         tokens.put("-", "2020");
         tokens.put("*", "2030");
         tokens.put("/", "2040");
-        tokens.put("%", "2050");
         tokens.put("=", "2060");
         tokens.put(">", "2070");
         tokens.put("<", "2080");
@@ -80,11 +63,7 @@ class AFDToken {
         tokens.put("!=", "2120");
         tokens.put("&&", "2130");
         tokens.put("||", "2140");
-        tokens.put("!", "2150");
-        tokens.put("&", "2160");
-        tokens.put("|", "2170");
 
-        // Otros símbolos, como puntuación y operadores bitwise
         tokens.put(",", "3010");
         tokens.put(".", "3020");
         tokens.put(";", "3030");
@@ -97,162 +76,151 @@ class AFDToken {
         tokens.put("}", "4020");
         tokens.put("(", "5010");
         tokens.put(")", "5020");
-        tokens.put("[", "5030");
-        tokens.put("]", "5040");
     }
 
-    // Método principal para analizar una línea de código
     public String[] analizarLinea(String linea) {
-        StringBuilder tokenActual = new StringBuilder(); // Almacena el token en construcción
-        Estado estadoActual = Estado.q0; // Estado inicial del autómata
-        String[] resultado = new String[1024]; // Arreglo para almacenar los tokens generados
-        int index = 0; // Índice del siguiente espacio disponible en el arreglo resultado
+        StringBuilder tokenActual = new StringBuilder();
+        Estado estadoActual = Estado.q0;
+        String[] resultado = new String[1024];
+        int index = 0;
 
-        for (int i = 0; i < linea.length(); i++) { // Recorre cada carácter de la línea
-            char ch = linea.charAt(i); // Carácter actual
+        for (int i = 0; i < linea.length(); i++) {
+            char ch = linea.charAt(i);
 
             switch (estadoActual) {
-                case q0 -> { // Estado inicial
-                    if (esLetra(ch)) { // Si es letra, puede ser identificador o palabra reservada
+                case q0 -> {
+                    if (esLetra(ch)) {
                         tokenActual.append(ch);
-                        estadoActual = Estado.q1; // Cambia al estado de identificador
-                    } else if (esNumero(ch)) { // Si es número, inicia un token numérico
+                        estadoActual = Estado.q1;
+                    } else if (esNumero(ch)) {
                         tokenActual.append(ch);
-                        estadoActual = Estado.q2; // Cambia al estado de número
-                    } else if (ch == '"') { // Si es una comilla, inicia una cadena
+                        estadoActual = Estado.q2;
+                    } else if (ch == '"') {
                         tokenActual.append(ch);
-                        estadoActual = Estado.q4; // Cambia al estado de cadena
-                    } else if (esSimbolo(ch)) { // Si es un símbolo, procesa el símbolo
+                        estadoActual = Estado.q4;
+                    } else if (esSimbolo(ch)) {
                         tokenActual.append(ch);
-                        estadoActual = Estado.q3; // Cambia al estado de símbolo
+                        estadoActual = Estado.q3;
                     } else if (Character.isWhitespace(ch)) {
-                        // Ignora espacios en blanco
-                    } else { // Carácter desconocido o inválido
+                        // Ignorar espacios en blanco
+                    } else {
+                        // Caracter no válido, ir a qError
                         tokenActual.append(ch);
-                        estadoActual = Estado.qError; // Cambia al estado de error
+                        estadoActual = Estado.qError;
                     }
                 }
-                case q1 -> { // Estado de identificador o palabra reservada
+                case q1 -> {
                     if (esLetra(ch) || esNumero(ch)) {
-                        tokenActual.append(ch); // Sigue construyendo el token
-                    } else { // Token finalizado
-                        resultado[index++] = getToken(tokenActual.toString()); // Emite el token
-                        tokenActual.setLength(0); // Limpia el buffer del token actual
-                        estadoActual = Estado.q0; // Regresa al estado inicial
-                        i--; // Reanaliza el carácter actual
-                    }
-                }
-                case q2 -> { // Estado de número
-                    if (esNumero(ch)) {
-                        tokenActual.append(ch); // Sigue construyendo el token numérico
-                    } else { // Token numérico finalizado
-                        resultado[index++] = "7010(" + tokenActual + ")"; // Genera token numérico
-                        tokenActual.setLength(0); // Limpia el buffer del token actual
-                        estadoActual = Estado.q0; // Regresa al estado inicial
-                        i--; // Reanaliza el carácter actual
-                    }
-                }
-                case q3 -> { // Estado de símbolo
-                    String simboloCompuesto = tokenActual.toString() + ch; // Construye símbolo compuesto
-                    if (esSimboloCompuesto(simboloCompuesto)) { // Si forma un símbolo compuesto
                         tokenActual.append(ch);
-                        resultado[index++] = getToken(tokenActual.toString()); // Genera el token
-                        tokenActual.setLength(0); // Limpia el buffer del token actual
-                        estadoActual = Estado.q0; // Regresa al estado inicial
-                    } else { // Es un símbolo simple
-                        resultado[index++] = getToken(tokenActual.toString()); // Genera el token
-                        tokenActual.setLength(0); // Limpia el buffer del token actual
-                        estadoActual = Estado.q0; // Regresa al estado inicial
-                        i--; // Reanaliza el carácter actual
+                    } else {
+                        resultado[index++] = getToken(tokenActual.toString());
+                        tokenActual.setLength(0);
+                        estadoActual = Estado.q0;
+                        i--;
+                    }
+                }
+                case q2 -> {
+                    if (esNumero(ch)) {
+                        tokenActual.append(ch);
+                    } else {
+                        resultado[index++] = "7010(" + tokenActual + ")";
+                        tokenActual.setLength(0);
+                        estadoActual = Estado.q0;
+                        i--;
+                    }
+                }
+                case q3 -> {
+                    String simboloCompuesto = tokenActual.toString() + ch;
+                    if (esSimboloCompuesto(simboloCompuesto)) {
+                        tokenActual.append(ch);
+                        resultado[index++] = getToken(tokenActual.toString());
+                        tokenActual.setLength(0);
+                        estadoActual = Estado.q0;
+                    } else {
+                        resultado[index++] = getToken(tokenActual.toString());
+                        tokenActual.setLength(0);
+                        estadoActual = Estado.q0;
+                        i--;
                     }
                 }
                 case q4 -> { // Estado de cadena
                     tokenActual.append(ch);
-                    if (ch == '"') { // Cierra la cadena
-                        resultado[index++] = "3080(" + tokenActual + ")"; // Genera token de cadena
-                        tokenActual.setLength(0); // Limpia el buffer del token actual
-                        estadoActual = Estado.q0; // Regresa al estado inicial
+                    if (ch == '"') {
+                        resultado[index++] = "3080(" + tokenActual + ")";
+                        tokenActual.setLength(0);
+                        estadoActual = Estado.q0;
                     }
                 }
                 case qError -> { // Estado de error
-                    resultado[index++] = "ERROR(" + tokenActual + ")"; // Genera un token de error
-                    tokenActual.setLength(0); // Limpia el buffer del token actual
-                    estadoActual = Estado.q0; // Regresa al estado inicial
+                    resultado[index++] = "ERROR(" + tokenActual + ")";
+                    tokenActual.setLength(0);
+                    estadoActual = Estado.q0;
                 }
             }
         }
 
-        if (!tokenActual.isEmpty()) { // Si hay un token pendiente al final de la línea
-            resultado[index++] = getToken(tokenActual.toString()); // Emite el token
+        if (!tokenActual.isEmpty()) {
+            if (estadoActual == Estado.qError) {
+                resultado[index++] = "ERROR(" + tokenActual + ")";
+            } else {
+                resultado[index++] = getToken(tokenActual.toString());
+            }
         }
 
-        // Copia los tokens válidos a un nuevo arreglo del tamaño adecuado
         String[] tokensFinal = new String[index];
-        System.arraycopy(resultado, 0, tokensFinal, 0, index); // Copia desde resultado al nuevo arreglo
-        return tokensFinal; // Retorna el arreglo final de tokens
+        System.arraycopy(resultado, 0, tokensFinal, 0, index);
+        return tokensFinal;
     }
 
-    // Métodos auxiliares para verificar tipos de caracteres
     private boolean esLetra(char ch) {
         for (char letra : letras) {
-            if (letra == ch) {
-                return true;
-            }
+            if (letra == ch) return true;
         }
         return false;
     }
 
     private boolean esNumero(char ch) {
         for (char numero : numeros) {
-            if (numero == ch) {
-                return true;
-            }
+            if (numero == ch) return true;
         }
         return false;
     }
 
     private boolean esSimbolo(char ch) {
         for (char simbolo : simbolos) {
-            if (simbolo == ch) {
-                return true;
-            }
+            if (simbolo == ch) return true;
         }
         return false;
     }
 
     private boolean esSimboloCompuesto(String str) {
         for (String simbolo : simbolosCompuestos) {
-            if (simbolo.equals(str)) {
-                return true;
-            }
+            if (simbolo.equals(str)) return true;
         }
         return false;
     }
 
-    // Método para obtener el token asociado a una cadena
     private String getToken(String str) {
         return tokens.getOrDefault(str, "6000") + "(" + str + ")";
     }
 }
 
-// Clase principal que ejecuta el programa
 public class Main {
     public static void main(String[] args) {
-        AFDToken afd = new AFDToken(); // Crea una instancia del analizador léxico
+        AFDToken afd = new AFDToken();
 
-        try (BufferedReader lector = new BufferedReader(new FileReader("src/cpp/programa_cpp_nuevo.txt"))) {
-            // Abre el archivo fuente para leer línea por línea
+        try (BufferedReader lector = new BufferedReader(new FileReader("src/cpp/programa_cpp.txt"))) {
             String linea;
-            while ((linea = lector.readLine()) != null) { // Mientras haya líneas por leer
-                String[] tokens = afd.analizarLinea(linea); // Analiza la línea para obtener tokens
-                for (String token : tokens) { // Imprime cada token generado
+            while ((linea = lector.readLine()) != null) {
+                String[] tokens = afd.analizarLinea(linea);
+                for (String token : tokens) {
                     System.out.print(token + " ");
                 }
-                System.out.println(); // Salto de línea después de procesar cada línea
+                System.out.println();
             }
-        } catch (IOException e) { // Manejo de excepciones si el archivo no se encuentra o no se puede leer
-            e.printStackTrace(); // Imprime el stacktrace del error
-            System.err.println("Archivo no encontrado en la ruta especificada o el archivo está dañado");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al leer el archivo");
         }
     }
 }
