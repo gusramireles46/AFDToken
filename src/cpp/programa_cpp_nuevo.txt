@@ -1,5 +1,18 @@
+suma=5a;
+suma-resta;
+
+int a = 5;
+int b = 6;
+int res = a + b;
+
+
+5.821
+7
+
+
+
 #include <iostream>
-@
+
 using namespace std;
 
 int main() {
