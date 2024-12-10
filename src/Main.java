@@ -93,7 +93,7 @@ class AFDToken {
 
             switch (estadoActual) {
                 case q0 -> {
-                    if (!esCaracterValido(ch)) {
+                    if (esCaracterValido(ch)) {
                         resultado[index++] = "ERROR(" + ch + ")";
                     } else if (esNumero(ch)) {
                         tokenActual.append(ch);
@@ -118,7 +118,7 @@ class AFDToken {
                 case q1 -> { // Maneja identificadores y palabras reservadas
                     if (esLetra(ch) || esNumero(ch) || ch == '_' || ch == '$') {
                         tokenActual.append(ch);
-                    } else if (!esCaracterValido(ch)) {
+                    } else if (esCaracterValido(ch)) {
                         tokenActual.append(ch);
                         estadoActual = Estado.qError;
                     } else {
@@ -129,7 +129,7 @@ class AFDToken {
                         } else if (esIdentificadorValido(palabra)) {
                             // Es un identificador válido
                             if (!identificadores.containsKey(palabra)) {
-                                identificadores.put(palabra, contadorIdentificadores++);
+                                identificadores.put(palabra, contadorIdentificadores+=5);
                             }
                             resultado[index++] = identificadores.get(palabra) + "(" + palabra + ")";
                         } else {
@@ -147,7 +147,7 @@ class AFDToken {
                     } else if (ch == '.') {
                         tokenActual.append(ch);
                         estadoActual = Estado.q5;
-                    } else if (!esCaracterValido(ch) || esLetra(ch)) {
+                    } else if (esCaracterValido(ch) || esLetra(ch)) {
                         tokenActual.append(ch);
                         estadoActual = Estado.qError;
                     } else {
@@ -166,7 +166,7 @@ class AFDToken {
                 case q5 -> { // Maneja la parte decimal de los flotantes
                     if (esNumero(ch)) {
                         tokenActual.append(ch);
-                    } else if (ch == '.' || !esCaracterValido(ch) || esLetra(ch)) {
+                    } else if (ch == '.' || esCaracterValido(ch) || esLetra(ch)) {
                         // Detecta un segundo punto o un carácter inválido en un flotante
                         tokenActual.append(ch);
                         estadoActual = Estado.qError; // Enviar al estado de error
@@ -228,7 +228,7 @@ class AFDToken {
                     resultado[index++] = tokens.get(palabra) + "(" + palabra + ")";
                 } else if (esIdentificadorValido(palabra)) {
                     if (!identificadores.containsKey(palabra)) {
-                        identificadores.put(palabra, contadorIdentificadores++);
+                        identificadores.put(palabra, contadorIdentificadores);
                     }
                     resultado[index++] = identificadores.get(palabra) + "(" + palabra + ")";
                 } else {
@@ -251,7 +251,7 @@ class AFDToken {
     }
 
     private boolean esCaracterValido(char ch) {
-        return esLetra(ch) || esNumero(ch) || esSimbolo(ch) || Character.isWhitespace(ch);
+        return !esLetra(ch) && !esNumero(ch) && !esSimbolo(ch) && !Character.isWhitespace(ch);
     }
 
     private boolean esLetra(char ch) {
@@ -330,6 +330,7 @@ class AFDToken {
                 }
                 case q8 -> { // Reconociendo la parte entera
                     if (esNumero(ch)) {
+                        continue;
                         // Sigue reconociendo enteros
                     } else if (ch == '.') {
                         estadoActual = Estado.q9; // envia al punto decimal
@@ -346,6 +347,7 @@ class AFDToken {
                 }
                 case q10 -> { // Reconociendo la parte decimal
                     if (esNumero(ch)) {
+                        continue;
                         // Sigue reconociendo dígitos decimales
                     } else {
                         estadoActual = Estado.qError;
@@ -380,7 +382,6 @@ public class Main {
                 System.out.println();
             }
         } catch (IOException e) {
-            e.printStackTrace();
             System.err.println("Error al leer el archivo");
         }
     }
